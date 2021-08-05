@@ -1,0 +1,53 @@
+<div class="layout">
+
+    <header class="layout-header">
+        <mat-form-field class="search-form-field" appearance="outline">
+            <mat-label>Search...</mat-label>
+            <input matInput placeholder="Enter movie title..." [(ngModel)]="searchString"
+                (ngModelChange)="searchMovies()">
+            <mat-icon class="search-button" matSuffix>search</mat-icon>
+        </mat-form-field>
+    </header>
+
+    <main class="layout-main">
+
+        <div class="layout-content" *ngIf="searchString && movies.length">
+            <app-movie-list [movies]='movies'></app-movie-list>
+        </div>
+
+        <div class="no-movie-message" *ngIf="!searchString">
+            <mat-icon class="no-movie-message-icon">arrow_upward</mat-icon>
+            <mat-icon class="no-movie-message-icon">arrow_upward</mat-icon>
+            <span class="no-movie-message-text">
+                Enter Movie title into the search box
+            </span>
+            <mat-icon class="no-movie-message-icon">arrow_upward</mat-icon>
+            <mat-icon class="no-movie-message-icon">arrow_upward</mat-icon>
+        </div>
+
+
+        <div class="no-movie-message"
+            *ngIf="response && searchString && !movies.length && movieRequested && !response.errorMessage">
+            No movie with that title found...
+            <mat-icon class="no-movie-message-icon">sentiment_dissatisfied</mat-icon>
+        </div>
+
+        <div class="no-movie-message" *ngIf="!response && searchString && !movies.length">
+            <span class="no-movie-message-text">
+                Looking for: {{searchString}}
+            </span>
+            <mat-icon class="no-movie-message-icon">search</mat-icon>
+        </div>
+
+
+        <div class="no-movie-message" *ngIf="response && searchString && !movies.length && response.errorMessage">
+            <span class="no-movie-message-text">
+                Error: {{response.errorMessage}}
+            </span>
+            <mat-icon class="no-movie-message-icon">sentiment_dissatisfied</mat-icon>
+        </div>
+
+
+    </main>
+
+</div>

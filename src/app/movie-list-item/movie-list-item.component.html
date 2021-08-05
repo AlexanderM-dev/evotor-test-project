@@ -1,0 +1,11 @@
+<mat-card class="movie-card" (click)="redirectTo()">
+    <mat-card-header class="movie-card-header">
+        <mat-card-title class="title">
+            {{movie.title}}
+        </mat-card-title>
+    </mat-card-header>
+    <img class="movie-poster" mat-card-image [src]="movie.image" alt="Movie Poster">
+    <mat-card-content>
+        <p>{{movie.description}}</p>
+    </mat-card-content>
+</mat-card>
