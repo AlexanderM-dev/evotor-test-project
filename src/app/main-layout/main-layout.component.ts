@@ -1,5 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { FormControl } from '@angular/forms';
+import { BehaviorSubject, Subscription } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 // local
 import { IMovie, ISearchMovie, MovieService } from '../services/movie.service';
 
@@ -10,49 +12,64 @@ import { IMovie, ISearchMovie, MovieService } from '../services/movie.service';
 })
 export class MainLayoutComponent implements OnInit, OnDestroy {
 
-  searchString = '';
+  searchControl = new FormControl('');
   timeOut?: number;
 
   movies: IMovie[] = [];
   movieSubscription?: Subscription;
-  movieRequested = false;
+  controlSubscription?: Subscription;
+  getMoviesListSubscription?: Subscription;
+  movieRequested$: BehaviorSubject<boolean>;
   response?: ISearchMovie;
 
   constructor(
     public service: MovieService,
   ) {
+    this.movieRequested$ = this.service.movieRequested$;
     this.movieSubscription = this.service.movies$.subscribe((searchMovieResponse: ISearchMovie) => {
       this.movies = searchMovieResponse.results || [];
     });
   }
 
   ngOnInit(): void {
+    this.searchControl.setValue(this.service.searchString);
+    this.controlSubscription = this.searchControl.valueChanges
+      .pipe(
+        debounceTime(1000)
+      )
+      .subscribe({
+        next: (searchValue) => {
+          this.service.searchString = searchValue;
+          this.searchMovies(searchValue);
+        }
+      });
   }
 
   ngOnDestroy(): void {
     if (this.movieSubscription) {
       this.movieSubscription.unsubscribe();
     }
+    if (this.controlSubscription) {
+      this.controlSubscription.unsubscribe();
+    }
   }
 
   /** Запрос на получение ISearchMovie */
-  searchMovies(): void {
-    if (this.searchString) {
-      if (this.timeOut) {
-        window.clearTimeout(this.timeOut);
+  searchMovies(searchValue: string): void {
+    if (searchValue) {
+      if (this.getMoviesListSubscription) {
+        this.getMoviesListSubscription.unsubscribe();
       }
-      this.timeOut = window.setTimeout(() => {
-        this.service.getMoviesList(this.searchString).subscribe({
-          next: (response) => {
-            this.response = response;
-            this.service.movies$.next(response);
-            this.movieRequested = true;
-          },
-          error: (err) => {
-            console.log(err.error.message);
-          }
-        });
-      }, 1000);
+      this.getMoviesListSubscription = this.service.getMoviesList(this.searchControl.value).subscribe({
+        next: (response) => {
+          this.response = response;
+          this.service.movies$.next(response);
+          this.movieRequested$.next(true);
+        },
+        error: (err) => {
+          console.log(err.error.message);
+        }
+      });
     } else {
       this.service.movies$.next({
         searchType: '',
@@ -60,7 +77,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
         results: [],
         errorMessage: ''
       });
-      this.movieRequested = false;
+      this.movieRequested$.next(false);
     }
   }
 

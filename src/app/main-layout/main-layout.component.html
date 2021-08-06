@@ -3,19 +3,17 @@
     <header class="layout-header">
         <mat-form-field class="search-form-field" appearance="outline">
             <mat-label>Search...</mat-label>
-            <input matInput placeholder="Enter movie title..." [(ngModel)]="searchString"
-                (ngModelChange)="searchMovies()">
+            <input matInput placeholder="Enter movie title..." [formControl]="searchControl">
             <mat-icon class="search-button" matSuffix>search</mat-icon>
         </mat-form-field>
     </header>
 
     <main class="layout-main">
-
-        <div class="layout-content" *ngIf="searchString && movies.length">
+        <div class="layout-content" *ngIf="searchControl.value && movies.length">
             <app-movie-list [movies]='movies'></app-movie-list>
         </div>
 
-        <div class="no-movie-message" *ngIf="!searchString">
+        <div class="no-movie-message" *ngIf="!searchControl.value">
             <mat-icon class="no-movie-message-icon">arrow_upward</mat-icon>
             <mat-icon class="no-movie-message-icon">arrow_upward</mat-icon>
             <span class="no-movie-message-text">
@@ -27,20 +25,20 @@
 
 
         <div class="no-movie-message"
-            *ngIf="response && searchString && !movies.length && movieRequested && !response.errorMessage">
+            *ngIf="response && searchControl.value && !movies.length && (movieRequested$ | async) && !response.errorMessage">
             No movie with that title found...
             <mat-icon class="no-movie-message-icon">sentiment_dissatisfied</mat-icon>
         </div>
 
-        <div class="no-movie-message" *ngIf="!response && searchString && !movies.length">
+        <div class="no-movie-message" *ngIf="!response && searchControl.value && !movies.length">
             <span class="no-movie-message-text">
-                Looking for: {{searchString}}
+                Looking for: {{searchControl.value}}
             </span>
             <mat-icon class="no-movie-message-icon">search</mat-icon>
         </div>
 
 
-        <div class="no-movie-message" *ngIf="response && searchString && !movies.length && response.errorMessage">
+        <div class="no-movie-message" *ngIf="response && searchControl.value && !movies.length && response.errorMessage">
             <span class="no-movie-message-text">
                 Error: {{response.errorMessage}}
             </span>

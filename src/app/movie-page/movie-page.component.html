@@ -1,0 +1,109 @@
+<div class="layout" *ngIf="!isLoading && currentMovie && currentMovie.id; else error">
+
+    <header class="layout-header">
+        <button class="button-back" mat-icon-button disableRipple=true routerLink="..">
+            <mat-icon>arrow_back_ios_new</mat-icon>
+        </button>
+        <h1 class="header">
+            {{currentMovie.title}}
+            ({{currentMovie.year}})
+        </h1>
+    </header>
+
+    <main class="layout-main">
+
+        <div class="layout-content">
+
+            <div>
+                <img class="movie-poster" [src]="currentMovie.image" alt="Movie Poster"
+                    (click)="redirectTo(currentMovie.id, 'movie')">
+
+                <div class="movie-info-subblock" *ngIf="currentMovie.directorList">
+                    <h2><strong>Director list</strong></h2>
+                    <span class="name" *ngFor="let director of currentMovie.directorList"
+                        (click)="redirectTo(director.id, 'people')">
+                        {{director.name}}
+                    </span>
+                </div>
+                <div class="movie-info-subblock" *ngIf="currentMovie.writerList">
+                    <h2><strong>Writer list</strong></h2>
+                    <span class="name" *ngFor="let writer of currentMovie.writerList"
+                        (click)="redirectTo(writer.id, 'people')">
+                        {{writer.name}}
+                    </span>
+                </div>
+                <div class="movie-info-subblock" *ngIf="currentMovie.starList">
+                    <h2><strong>Star list</strong></h2>
+                    <span class="name" *ngFor="let star of currentMovie.starList"
+                        (click)="redirectTo(star.id, 'people')">
+                        {{star.name}}
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="movie-info">
+
+                <mat-chip-list class="movie-genre" *ngIf="currentMovie.genreList">
+                    <mat-chip class="name" *ngFor="let genre of currentMovie.genreList"
+                        (click)="redirectTo(genre.key, 'genre')">
+                        {{genre.value}}
+                    </mat-chip>
+                </mat-chip-list>
+                <br>
+                <div *ngIf="currentMovie.releaseDate">
+                    <strong>Release date:</strong> {{currentMovie.releaseDate}}
+                </div>
+                <div *ngIf="currentMovie.contentRating">
+                    <strong>Content Raiting:</strong> {{currentMovie.contentRating}}
+                </div>
+                <div *ngIf="currentMovie.imDbRating">
+                    <strong>IMDB Raiting:</strong> {{currentMovie.imDbRating}}/10
+                </div>
+                <div class="movie-info-subblock" *ngIf="currentMovie.plot">
+                    <h2><strong>Stroyline</strong></h2>
+                    {{currentMovie.plot}}
+                </div>
+
+
+                <h2><strong>Actor list</strong></h2>
+                <div class="movie-actors">
+                    <mat-card class="actor-block" *ngFor="let actor of currentMovie.actorList"
+                        (click)="redirectTo(actor.id, 'people')">
+                        <mat-card-header>
+                            <div mat-card-avatar class="actor-image-block"><img class="actor-image" [src]="actor.image"
+                                    alt="Actor Photo"></div>
+                            <mat-card-title>{{actor.name}}</mat-card-title>
+                            <mat-card-subtitle>as {{actor.asCharacter}}</mat-card-subtitle>
+                        </mat-card-header>
+                    </mat-card>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+<ng-template #error>
+    <div *ngIf="!isLoading" class="layout">
+        <header class="layout-header">
+            <button class="button-back" mat-icon-button disableRipple=true routerLink="..">
+                <mat-icon>arrow_back_ios_new</mat-icon>
+            </button>
+            <h1 class="header">
+                Error
+            </h1>
+        </header>
+
+        <div class="layout-main">
+            <div class="no-movie-message">
+                <span class="no-movie-message-text">
+                    404 MOVIE NOT FOUND
+                </span>
+            </div>
+        </div>
+    </div>
+</ng-template>

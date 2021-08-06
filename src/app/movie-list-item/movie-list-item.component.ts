@@ -1,4 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 // local
 import { IMovie } from '../services/movie.service';
 
@@ -11,14 +12,16 @@ export class MovieListItemComponent implements OnInit {
 
   @Input() movie!: IMovie;
 
-  constructor() { }
+  constructor(
+    private router: Router
+  ) { }
 
   ngOnInit(): void {
   }
 
   /** Переход на страницу фильма */
   redirectTo(): void {
-    window.open(`https://www.imdb.com/title/${this.movie.id}`);
+    this.router.navigate([`${this.movie.id}`]);
   }
 
 }
